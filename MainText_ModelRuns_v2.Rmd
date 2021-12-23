@@ -1,0 +1,528 @@
+---
+title: "Main text figures: The benefits and consequences of predator-mediated mutualisms"
+author: "--"
+date: "5 May 2021"
+output: 
+  pdf_document:
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+require(fields) # has image.plot function
+
+require(plot3D) # has plot2D
+
+#install.packages("devtools")
+#devtools::install_github("G-Thomson/Manu")
+
+# See this for colour palettes
+# https://g-thomson.github.io/Manu/
+
+kotare <- c("#214d65", "#287DAB", "#E5BF86", "#B09771", "#624B27", "#CACFD0")
+
+
+```
+
+*Figure 2:* Timeseries of changing predator abundances.
+
+```{r figure2, echo=FALSE,fig.height=8,fig.width=8}
+# PARAMETERS
+k <- 1;				# scaling of fish carrying capacity with coral biomass
+k_D <- k;
+k_H <- k;
+
+rho <- 0.1;			# fish growth rates
+rho_D <- rho;
+rho_H <- rho;
+
+mu <- .9;			# coral intrinsic mortality rate
+
+epsilon <- 0.1;		# effect of hawkfish (pee) relative to damselfish
+epsilon2 <- 1;
+alpha <- 0.5;		# relative competitive effect of damselfish on hawkfish
+phi <- 2;			# relative predation intensity of predator on hawkfish
+
+# COLOURS
+dcol <- 'royalblue2'
+hcol <- 'orange2'
+ccol <- 'seagreen'
+pcol <- 'gray50'
+
+# SIMULATION
+p_set <- c(0,0.05,0.1);
+t_end <- 365*10*length(p_set);
+tset <- seq(from=0, to = t_end, length.out = 10*t_end)
+
+d.simu1 <- NaN*tset; d.simu1[1] <- .1;
+h.simu1 <- d.simu1;
+c.simu1 <- d.simu1;
+p.simu1 <- d.simu1; p.simu1[1] <- p_set[1];
+
+d.simu2 <- d.simu1;
+h.simu2 <- d.simu1;
+c.simu2 <- d.simu1;
+
+for(i in 2:length(tset)){
+	dt <- tset[i]-tset[i-1]
+	d <- d.simu1[i-1]
+	h <- h.simu1[i-1]
+	c <- c.simu1[i-1]
+
+	d2 <- d.simu2[i-1]
+	h2 <- h.simu2[i-1]
+	c2 <- c.simu2[i-1]
+
+	p <- p_set[2]
+	if(i < length(tset)/3){
+	  p <- p_set[1]
+	}
+	if(i > 2*length(tset)/3){
+	  p <- p_set[3]
+	}
+
+	dc <- ((c+d+epsilon*h)*(1-c)-mu*c)*dt 
+	dd <- (rho_D*d*(k_D*c-d-h)/(k_D*c)-d*p)*dt
+	dh <- (rho_H*h*(k_H*c-h-alpha*d)/(k_H*c)-phi*h*p)*dt
+
+	dc2 <- ((c2+d2+epsilon2*h2)*(1-c2)-mu*c2)*dt 
+	dd2 <- (rho_D*d2*(k_D*c2-d2-h2)/(k_D*c2)-d2*p)*dt
+	dh2 <- (rho_H*h2*(k_H*c2-h2-alpha*d2)/(k_H*c2)-phi*h2*p)*dt
+
+	c.simu1[i] <- c+dc
+	d.simu1[i] <- d+dd
+	h.simu1[i] <- h+dh
+	p.simu1[i] <- p
+
+	c.simu2[i] <- c2+dc2
+	d.simu2[i] <- d2+dd2
+	h.simu2[i] <- h2+dh2
+}
+ 
+par(mfrow=c(2,1),mar=c(4,4,1,1))
+
+plot(tset/365,c.simu2,col=ccol,lwd=2,las=1,xlab='Time',ylab='Biomass',ylim=c(0,max(max(c.simu2),max(d.simu2),max(h.simu2))),type='l'); lines(tset/365,d.simu2,col=dcol,lwd=2); lines(tset/365,h.simu2,col=hcol,lwd=2); legend(x = 0.75*t_end/365,y=0.95*max(max(c.simu2),max(d.simu2),max(h.simu2)),legend=c('Coral','Damselfish','Hawkfish'),lwd=2,col=c(ccol,dcol,hcol)); abline(v=c(t_end/3,2*t_end/3)/365, lwd=2, lty=2, col='black') #lines(tset/365,p.simu1, lwd=2, col=pcol); legend(x = 0.8*t_end/365,y=0.85*max(max(c.simu2),max(d.simu2),max(h.simu2)),legend=c('Coral','Damselfish','Hawkfish','Predator'),lwd=2,col=c(ccol,dcol,hcol,pcol))
+
+plot(tset/365,c.simu1,col=ccol,lwd=2,las=1,xlab='Time',ylab='Biomass',ylim=c(0,max(max(c.simu1),max(d.simu1),max(h.simu1))),type='l'); lines(tset/365,d.simu1,col=dcol,lwd=2); lines(tset/365,h.simu1,col=hcol,lwd=2); abline(v=c(t_end/3,2*t_end/3)/365, lwd=2, lty=2, col='black') #lines(tset/365,p.simu1, lwd=2, col=pcol); #legend(x = 0.6*t_end/365,y=0.85*max(max(c.simu1),max(d.simu1),max(h.simu1)),legend=c('Coral','Damselfish','Hawkfish','Predator'),lwd=2,col=c(ccol,dcol,hcol,pcol))
+
+```
+
+
+
+*Figure 3:* Heatmaps of coral biomass as a function of predators and parameters.
+
+Simulations varying alpha and predator abundance:
+
+```{r}
+### Chunk is time-consuming to run. Un-comment to run; otherwise this code relies on saved data from a previous run. ###
+
+# phi <- 2
+# epsilon <- 0.5
+# 
+# pmax <- rho_D*(1-epsilon*k_H/k_D)
+# 
+# alphaset <- seq(from = 0, to = 1, length.out = 105)
+# Pset <- seq(from = 0, to = pmax, length.out = 100)
+# 
+# cstar <- matrix(rep(NaN,length(alphaset)*length(Pset)),nrow = length(alphaset),ncol = length(Pset))
+# dstar <- cstar
+# hstar <- cstar
+# 
+# t_end <- 365*2*10;
+# tset <- seq(from=0, to = t_end, length.out = 10*t_end)
+# 
+# for(k in 1:length(alphaset)){
+#   alpha <- alphaset[k]
+# for(j in 1:length(Pset)){
+#   p <- Pset[j]
+# d.simu1 <- NaN*tset; d.simu1[1] <- 0.5;
+# h.simu1 <- d.simu1;
+# c.simu1 <- d.simu1;
+# for(i in 2:length(tset)){
+# 	dt <- tset[i]-tset[i-1]
+# 	d <- d.simu1[i-1]
+# 	h <- h.simu1[i-1]
+# 	c <- c.simu1[i-1]
+# 	dc <- ((c+d+epsilon*h)*(1-c)-mu*c)*dt
+# 	dd <- (rho_D*d*(k_D*c-d-h)/(k_D*c)-d*p)*dt
+# 	dh <- (rho_H*h*(k_H*c-h-alpha*d)/(k_H*c)-phi*h*p)*dt
+# 	c.simu1[i] <- c+dc
+# 	d.simu1[i] <- d+dd
+# 	h.simu1[i] <- h+dh
+# }
+# 	dstar[k,j] <- d.simu1[length(tset)];
+#   hstar[k,j] <- h.simu1[length(tset)];
+#   cstar[k,j] <- c.simu1[length(tset)];
+# }}
+# 
+# 
+# dstar_a <- dstar
+# hstar_a <- hstar
+# cstar_a <- cstar
+
+```
+
+
+Simulations varying phi and predator abundance:
+
+```{r}
+### Chunk is time-consuming to run. Un-comment to run; otherwise this code relies on saved data from a previous run. ###
+
+# alpha <- 0.5
+# epsilon <- 0.5
+# 
+# pmax <- rho_D*(1-epsilon*k_H/k_D)
+# 
+# phiset <- seq(from = 1, to = 10, length.out = 105)
+# Pset <- seq(from = 0, to = pmax, length.out = 100)
+# 
+# cstar <- matrix(rep(NaN,length(phiset)*length(Pset)),nrow = length(phiset),ncol = length(Pset))
+# dstar <- cstar
+# hstar <- cstar
+# 
+# t_end <- 365*2*10;
+# tset <- seq(from=0, to = t_end, length.out = 10*t_end)
+# 
+# for(k in 1:length(phiset)){
+#   phi <- phiset[k]
+# for(j in 1:length(Pset)){
+#   p <- Pset[j]
+# d.simu1 <- NaN*tset; d.simu1[1] <- 0.5;
+# h.simu1 <- d.simu1;
+# c.simu1 <- d.simu1;
+# for(i in 2:length(tset)){
+# 	dt <- tset[i]-tset[i-1]
+# 	d <- d.simu1[i-1]
+# 	h <- h.simu1[i-1]
+# 	c <- c.simu1[i-1]
+# 	dc <- ((c+d+epsilon*h)*(1-c)-mu*c)*dt
+# 	dd <- (rho_D*d*(k_D*c-d-h)/(k_D*c)-d*p)*dt
+# 	dh <- (rho_H*h*(k_H*c-h-alpha*d)/(k_H*c)-phi*h*p)*dt
+# 	c.simu1[i] <- c+dc
+# 	d.simu1[i] <- d+dd
+# 	h.simu1[i] <- h+dh
+# }
+# 	dstar[k,j] <- d.simu1[length(tset)];
+#   hstar[k,j] <- h.simu1[length(tset)];
+#   cstar[k,j] <- c.simu1[length(tset)];
+# }}
+# 
+# 
+# 
+# dstar_p <- dstar
+# hstar_p <- hstar
+# cstar_p <- cstar
+
+```
+
+
+
+Simulations varying epsilon and predator abundance:
+
+```{r}
+### Chunk is time-consuming to run. Un-comment to run; otherwise this code relies on saved data from a previous run. ###
+
+# alpha <- 0.5
+# phi <- 2
+# 
+# pmax <- rho_D*(1-0*k_H/k_D)
+# 
+# epsilonset <- seq(from = 0, to = 1, length.out = 105)
+# Pset <- seq(from = 0, to = pmax, length.out = 100)
+# 
+# cstar <- matrix(rep(NaN,length(epsilonset)*length(Pset)),nrow = length(epsilonset),ncol = length(Pset))
+# dstar <- cstar
+# hstar <- cstar
+# 
+# t_end <- 365*2*10;
+# tset <- seq(from=0, to = t_end, length.out = 20*t_end)
+# 
+# for(k in 1:length(epsilonset)){
+#   epsilon <- epsilonset[k]
+# for(j in 1:length(Pset)){
+#   p <- Pset[j]
+# d.simu1 <- NaN*tset; d.simu1[1] <- 0.5;
+# h.simu1 <- d.simu1;
+# c.simu1 <- d.simu1;
+# for(i in 2:length(tset)){
+# 	dt <- tset[i]-tset[i-1]
+# 	d <- d.simu1[i-1]
+# 	h <- h.simu1[i-1]
+# 	c <- c.simu1[i-1]
+# 	dc <- ((c+d+epsilon*h)*(1-c)-mu*c)*dt
+# 	dd <- (rho_D*d*(k_D*c-d-h)/(k_D*c)-d*p)*dt
+# 	dh <- (rho_H*h*(k_H*c-h-alpha*d)/(k_H*c)-phi*h*p)*dt
+# 	c.simu1[i] <- c+dc
+# 	d.simu1[i] <- d+dd
+# 	h.simu1[i] <- h+dh
+# }
+# 	dstar[k,j] <- d.simu1[length(tset)];
+#   hstar[k,j] <- h.simu1[length(tset)];
+#   cstar[k,j] <- c.simu1[length(tset)];
+# }}
+# 
+# 
+# dstar_e <- dstar
+# hstar_e <- hstar
+# cstar_e <- cstar
+
+```
+
+
+```{r saveresults}
+# setwd('/Users/hollyvm/Box Sync/StierMoeller_PredMedMutualisms/Code/RCodes')
+
+# save(dstar_a,hstar_a,cstar_a,dstar_p,hstar_p,cstar_p,dstar_e,hstar_e,cstar_e,Pset,epsilonset,phiset,alphaset,file='Heatmap3.RData')
+
+```
+
+Load results
+
+```{r reloadresults}
+setwd('/Users/hollyvm/Box Sync/StierMoeller_PredMedMutualisms/Code/RCodes')
+
+#load('Heatmap1.Rdata') #low resolution: 20 x 25
+load('Heatmap3.Rdata') #high resolution: 100 x 105
+
+```
+
+
+```{r multipanelheatmap,fig.height=5,fig.width=4}
+
+kot <- colorRampPalette(colors = c(kotare[3],'white',kotare[2]))
+rwb <- colorRampPalette(colors = c("red", "white", "blue"))
+
+rwb <- kot
+
+zlimraw <- c(0.1,.55)
+zlimrel <- c(.18,4.5)
+
+par(mar=c(4,4,1,1),mfrow=c(3,2))
+
+#panelwidths = 2; panelheights = 2; layout(matrix(c(rep(7,1+2*panelwidths),rep(c(8,rep(1,panelwidths),rep(2,panelwidths)),panelheights),rep(c(8,rep(3,panelwidths),rep(4,panelwidths)),panelheights),rep(c(8,rep(5,panelwidths),rep(6,panelwidths)),panelheights)),nrow = (panelheights*3+1),ncol=(panelwidths*2+1),byrow=TRUE));layout.show(8)
+
+
+image.plot(x = Pset, y = alphaset, z = t(cstar_a),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.',zlim=zlimraw,main='Equilibrium Coral Biomass')
+relcstar_a <- cstar_a*NaN
+for(i in 1:length(alphaset)){
+  relcstar_a[i,1:length(Pset)] <- cstar_a[i,1:length(Pset)]/cstar_a[i,1]
+}
+image.plot(x = Pset, y = alphaset, z = t(relcstar_a),las=1,col=rwb(100),ylab='',xlab='Pred. Abun.',zlim=zlimrel,main='Coral Biomass Relative to Predator-Free System')
+
+image.plot(x = Pset, y = phiset, z = t(cstar_p),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.',zlim=zlimraw); 
+relcstar_p <- cstar_p*NaN
+for(i in 1:length(phiset)){
+  relcstar_p[i,1:length(Pset)] <- cstar_p[i,1:length(Pset)]/cstar_p[i,1]
+}
+image.plot(x = Pset, y = phiset, z = t(relcstar_p),las=1,col=rwb(100),ylab='',xlab='Pred. Abun.',zlim=zlimrel); 
+
+
+image.plot(x = Pset, y = epsilonset, z = t(cstar_e),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.',zlim=zlimraw); 
+relcstar_e <- cstar_e*NaN
+for(i in 1:length(epsilonset)){
+  relcstar_e[i,1:length(Pset)] <- cstar_e[i,1:length(Pset)]/cstar_e[i,1]
+}
+image.plot(x = Pset, y = epsilonset, z = t(relcstar_e),las=1,col=rwb(100),ylab='',xlab='Pred. Abun.',zlim=zlimrel)
+
+```
+
+```{r multipanelheatmap.notrescaled,fig.height=5,fig.width=4}
+
+kot <- colorRampPalette(colors = c(kotare[3],'white',kotare[2]))
+rwb <- colorRampPalette(colors = c("red", "white", "blue"))
+
+rwb <- kot
+
+
+par(mar=c(4,4,1,1),mfrow=c(3,2))
+
+#panelwidths = 2; panelheights = 2; layout(matrix(c(rep(7,1+2*panelwidths),rep(c(8,rep(1,panelwidths),rep(2,panelwidths)),panelheights),rep(c(8,rep(3,panelwidths),rep(4,panelwidths)),panelheights),rep(c(8,rep(5,panelwidths),rep(6,panelwidths)),panelheights)),nrow = (panelheights*3+1),ncol=(panelwidths*2+1),byrow=TRUE));layout.show(8)
+
+
+image.plot(x = Pset, y = alphaset, z = t(cstar_a),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.',main='Equilibrium Coral Biomass')
+relcstar_a <- cstar_a*NaN
+for(i in 1:length(alphaset)){
+  relcstar_a[i,1:(dim(relcstar_a)[2])] <- cstar_a[i,1:(dim(relcstar_a)[2])]/cstar_a[i,1]
+}
+image.plot(x = Pset, y = alphaset, z = t(relcstar_a),las=1,col=rwb(100),ylab='',xlab='Pred. Abun.',main='Coral Biomass Relative to Predator-Free System')
+
+image.plot(x = Pset, y = phiset, z = t(cstar_p),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.'); 
+relcstar_p <- cstar_p*NaN
+for(i in 1:length(phiset)){
+  #relcstar_p[i,1:length(Pset)] <- cstar_p[i,1:length(Pset)]/cstar_p[i,1]
+  relcstar_p[i,1:(dim(relcstar_p)[2])] <- cstar_p[i,1:(dim(relcstar_p)[2])]/cstar_p[i,1]
+}
+image.plot(x = Pset, y = phiset, z = t(relcstar_p),las=1,col=rwb(100),ylab='',xlab='Pred. Abun.'); 
+
+
+image.plot(x = Pset, y = epsilonset, z = t(cstar_e),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.'); 
+relcstar_e <- cstar_e*NaN
+for(i in 1:length(epsilonset)){
+  #relcstar_e[i,1:length(Pset)] <- cstar_e[i,1:length(Pset)]/cstar_e[i,1]
+  relcstar_e[i,1:(dim(relcstar_e)[2])] <- cstar_e[i,1:(dim(relcstar_e)[2])]/cstar_e[i,1]
+}
+image.plot(x = Pset, y = epsilonset, z = t(relcstar_e),las=1,col=rwb(100),ylab='',xlab='Pred. Abun.')
+
+```
+
+
+
+```{r multipanelheatmap.horiz,fig.height=3,fig.width=11}
+
+kot <- colorRampPalette(colors = c(kotare[3],'white',kotare[2]))
+rwb <- colorRampPalette(colors = c("red", "white", "blue"))
+
+#rwb <- kot
+
+
+par(mar=c(4,4,1,5),mfrow=c(1,3))
+
+#panelwidths = 2; panelheights = 2; layout(matrix(c(rep(7,1+2*panelwidths),rep(c(8,rep(1,panelwidths),rep(2,panelwidths)),panelheights),rep(c(8,rep(3,panelwidths),rep(4,panelwidths)),panelheights),rep(c(8,rep(5,panelwidths),rep(6,panelwidths)),panelheights)),nrow = (panelheights*3+1),ncol=(panelwidths*2+1),byrow=TRUE));layout.show(8)
+
+
+#image.plot(x = Pset, y = alphaset, z = t(cstar_a),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.',main='Equilibrium Coral Biomass')
+relcstar_a <- cstar_a*NaN
+for(i in 1:length(alphaset)){
+  relcstar_a[i,1:length(Pset)] <- cstar_a[i,1:length(Pset)]/cstar_a[i,1]
+}
+image.plot(x = Pset, y = alphaset, z = t(relcstar_a),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.')#,main='Coral Biomass Relative to Predator-Free System')
+
+#image.plot(x = Pset, y = phiset, z = t(cstar_p),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.'); 
+relcstar_p <- cstar_p*NaN
+for(i in 1:length(phiset)){
+  relcstar_p[i,1:length(Pset)] <- cstar_p[i,1:length(Pset)]/cstar_p[i,1]
+}
+image.plot(x = Pset, y = phiset, z = t(relcstar_p),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.'); 
+
+
+#image.plot(x = Pset, y = epsilonset, z = t(cstar_e),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.'); 
+relcstar_e <- cstar_e*NaN
+for(i in 1:length(epsilonset)){
+  relcstar_e[i,1:length(Pset)] <- cstar_e[i,1:length(Pset)]/cstar_e[i,1]
+}
+image.plot(x = Pset, y = epsilonset, z = t(relcstar_e),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.')
+
+```
+
+
+```{r multipanelheatmap.horiz.v2,fig.height=3,fig.width=11}
+
+kot <- colorRampPalette(colors = c(kotare[3],'white',kotare[2]))
+rwb <- colorRampPalette(colors = c("red", "white", "blue"))
+
+rwb <- kot
+
+
+par(mar=c(4,4,1,5),mfrow=c(1,3))
+
+#panelwidths = 2; panelheights = 2; layout(matrix(c(rep(7,1+2*panelwidths),rep(c(8,rep(1,panelwidths),rep(2,panelwidths)),panelheights),rep(c(8,rep(3,panelwidths),rep(4,panelwidths)),panelheights),rep(c(8,rep(5,panelwidths),rep(6,panelwidths)),panelheights)),nrow = (panelheights*3+1),ncol=(panelwidths*2+1),byrow=TRUE));layout.show(8)
+
+
+#image.plot(x = Pset, y = alphaset, z = t(cstar_a),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.',main='Equilibrium Coral Biomass')
+relcstar_a <- cstar_a*NaN
+for(i in 1:length(alphaset)){
+  relcstar_a[i,1:length(Pset)] <- cstar_a[i,1:length(Pset)]/cstar_a[i,1]
+}
+image.plot(x = Pset, y = alphaset, z = t(relcstar_a),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.')#,main='Coral Biomass Relative to Predator-Free System')
+
+#image.plot(x = Pset, y = phiset, z = t(cstar_p),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.'); 
+relcstar_p <- cstar_p*NaN
+for(i in 1:length(phiset)){
+  relcstar_p[i,1:length(Pset)] <- cstar_p[i,1:length(Pset)]/cstar_p[i,1]
+}
+image.plot(x = Pset, y = phiset, z = t(relcstar_p),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.'); 
+
+
+#image.plot(x = Pset, y = epsilonset, z = t(cstar_e),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.'); 
+relcstar_e <- cstar_e*NaN
+for(i in 1:length(epsilonset)){
+  relcstar_e[i,1:length(Pset)] <- cstar_e[i,1:length(Pset)]/cstar_e[i,1]
+}
+image.plot(x = Pset, y = epsilonset, z = t(relcstar_e),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.')
+
+```
+
+
+
+
+```{r multipanelheatmap.horiz.v2.log,fig.height=3,fig.width=11}
+
+kot <- colorRampPalette(colors = c(kotare[3],kotare[3],'white',kotare[2],kotare[2]))
+rwb <- colorRampPalette(colors = c("red", "white", "blue"))
+
+rwb <- kot
+
+
+par(mar=c(4,4,1,5),mfrow=c(1,3))
+
+#panelwidths = 2; panelheights = 2; layout(matrix(c(rep(7,1+2*panelwidths),rep(c(8,rep(1,panelwidths),rep(2,panelwidths)),panelheights),rep(c(8,rep(3,panelwidths),rep(4,panelwidths)),panelheights),rep(c(8,rep(5,panelwidths),rep(6,panelwidths)),panelheights)),nrow = (panelheights*3+1),ncol=(panelwidths*2+1),byrow=TRUE));layout.show(8)
+
+
+#image.plot(x = Pset, y = alphaset, z = t(cstar_a),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.',main='Equilibrium Coral Biomass')
+relcstar_a <- cstar_a*NaN
+for(i in 1:length(alphaset)){
+  relcstar_a[i,1:length(Pset)] <- cstar_a[i,1:length(Pset)]/cstar_a[i,1]
+}
+image.plot(x = Pset, y = alphaset, z = t(log10(relcstar_a)),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.',zlim=c(-.13,.13))#,main='Coral Biomass Relative to Predator-Free System')
+
+#image.plot(x = Pset, y = phiset, z = t(cstar_p),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.'); 
+relcstar_p <- cstar_p*NaN
+for(i in 1:length(phiset)){
+  relcstar_p[i,1:length(Pset)] <- cstar_p[i,1:length(Pset)]/cstar_p[i,1]
+}
+image.plot(x = Pset, y = phiset, z = t(log10(relcstar_p)),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.',zlim=c(-.16,.16)); 
+
+
+#image.plot(x = Pset, y = epsilonset, z = t(cstar_e),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.'); 
+relcstar_e <- cstar_e*NaN
+for(i in 1:length(epsilonset)){
+  relcstar_e[i,1:length(Pset)] <- cstar_e[i,1:length(Pset)]/cstar_e[i,1]
+}
+image.plot(x = Pset, y = epsilonset, z = t(log10(relcstar_e)),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.',zlim=c(-.73,.73))
+
+```
+
+
+```{r multipanelheatmap.horiz.v2.log.selfZlims,fig.height=3,fig.width=11}
+
+kot <- colorRampPalette(colors = c(kotare[3],'white',kotare[2]))
+rwb <- colorRampPalette(colors = c("red", "white", "blue"))
+
+rwb <- kot
+
+
+par(mar=c(4,4,1,5),mfrow=c(1,3))
+
+#panelwidths = 2; panelheights = 2; layout(matrix(c(rep(7,1+2*panelwidths),rep(c(8,rep(1,panelwidths),rep(2,panelwidths)),panelheights),rep(c(8,rep(3,panelwidths),rep(4,panelwidths)),panelheights),rep(c(8,rep(5,panelwidths),rep(6,panelwidths)),panelheights)),nrow = (panelheights*3+1),ncol=(panelwidths*2+1),byrow=TRUE));layout.show(8)
+
+rwb <- colorRampPalette(colors = c(kotare[3],kotare[3],'white',kotare[2],kotare[2],kotare[2]))
+
+#image.plot(x = Pset, y = alphaset, z = t(cstar_a),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.',main='Equilibrium Coral Biomass')
+relcstar_a <- cstar_a*NaN
+for(i in 1:length(alphaset)){
+  relcstar_a[i,1:length(Pset)] <- cstar_a[i,1:length(Pset)]/cstar_a[i,1]
+}
+image.plot(x = Pset, y = alphaset, z = t(log10(relcstar_a)),las=1,col=rwb(100),ylab='Alpha',xlab='Pred. Abun.')#,main='Coral Biomass Relative to Predator-Free System')
+
+rwb <- colorRampPalette(colors = c(kotare[3],kotare[3],kotare[3],'white',kotare[2],kotare[2]))
+#rwb <- colorRampPalette(colors = c(kotare[3],kotare[3],kotare[3],kotare[3],'white',kotare[2],kotare[2],kotare[2]))
+
+#image.plot(x = Pset, y = phiset, z = t(cstar_p),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.'); 
+relcstar_p <- cstar_p*NaN
+for(i in 1:length(phiset)){
+  relcstar_p[i,1:length(Pset)] <- cstar_p[i,1:length(Pset)]/cstar_p[i,1]
+}
+image.plot(x = Pset, y = phiset, z = t(log10(relcstar_p)),las=1,col=rwb(100),ylab='Phi',xlab='Pred. Abun.'); 
+
+
+rwb <- colorRampPalette(colors = c(kotare[3],'white',kotare[2]))
+
+#image.plot(x = Pset, y = epsilonset, z = t(cstar_e),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.'); 
+relcstar_e <- cstar_e*NaN
+for(i in 1:length(epsilonset)){
+  relcstar_e[i,1:length(Pset)] <- cstar_e[i,1:length(Pset)]/cstar_e[i,1]
+}
+image.plot(x = Pset, y = epsilonset, z = t(log10(relcstar_e)),las=1,col=rwb(100),ylab='Epsilon',xlab='Pred. Abun.')
+
+```

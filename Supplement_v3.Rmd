@@ -1,0 +1,435 @@
+---
+title: "Supplement: The benefits and consequences of predator-mediated mutualisms"
+author: "--"
+date: "5 May 2021"
+output: html_document
+---
+
+## Supplementary Documentation for "The Benefits and Consequences of Predator-Mediated Mutualisms"
+
+
+```{r setup, echo=FALSE}
+
+hcol <- 'royalblue2'
+ccol <- 'orange2'
+dcol <- 'seagreen'
+pcol <- 'gray50'
+
+k <- 1;				# scaling of fish carrying capacity with coral biomass
+k_D <- k;
+k_H <- k;
+
+rho <- 0.1;			# fish growth rates
+rho_D <- rho;
+rho_H <- rho;
+
+mu <- .5;			# coral intrinsic death rate
+
+epsilon <- 0.8;		# effect of hawkfish (pee) relative to damselfish
+epsilon2 <- 1;
+alpha <- 0.5;		# relative competitive effect of damselfish on hawkfish
+phi <- 2;			# relative predation intensity of predator on hawkfish
+
+```
+
+
+####Non-dimensionalization
+
+Our dimensional set of equations is:
+
+$$
+\begin{align}
+\frac{dC}{d\tau} &= \left(r_CC+g_DD+g_HH\right)\left(1-\frac{C}{C_T}\right)-mC \\[2ex]
+\frac{dD}{d\tau} &= r_DD \left( \frac{k_DC-D-\alpha_{DH}H}{k_DC}\right)-a_DDP \\[2ex]
+\frac{dH}{d\tau} &= r_HH \left( \frac{k_HC-H-\alpha_{HD}D}{k_HC}\right)-a_HHP \\[2ex]
+\end{align}
+$$
+
+The key first decision that we make is to rescale time by the intrinsic growth rate of the coral $r_C$. (Note that this growth rate is the amalgamation of new recruitment and lateral extension.) Thus we employ the substitution $t = r_C \tau$. Simultaneously, we rescale coral by the maximum areal extent $C_T$ via the substitution $C = C_Tc$:
+
+$$
+\begin{align}
+\frac{dc}{dt} &= \left(c+\frac{g_D}{r_CC_T}D+\frac{g_H}{r_CC_T}H\right)\left(1-c\right)-\frac{m}{r_C}c \\[2ex]
+\frac{dD}{dt} &= \frac{r_D}{r_C}D \left( \frac{k_DC_Tc-D-\alpha_{DH}H}{k_DC_Tc}\right)-\frac{a_D}{r_C}DP \\[2ex]
+\frac{dH}{dt} &= \frac{r_H}{r_C}H \left( \frac{k_HC_Tc-H-\alpha_{HD}D}{k_HC_Tc}\right)-\frac{a_H}{r_C}HP \\[2ex]
+\end{align}
+$$
+
+This system of equations gives us a clue for our substitution for $D$. Let us define the dimensionaless new state variable $d = (g_DD)/(r_CC_T)$ and substitute $D = (dr_CC_T)/(g_D)$. Simultaneously, we will define $h = (\alpha_{DH}g_DH)/(r_CC_T)$ and substitute $H=(hr_CC_T)/(\alpha_{DH}g_D)$:
+
+$$
+\begin{align}
+\frac{dc}{dt} &= \left(c+d+\frac{g_H}{\alpha_{DH}g_D}h\right)\left(1-c\right)-\frac{m}{r_C}c \\[2ex]
+\frac{dd}{dt} &= \frac{r_D}{r_C}d \left( \frac{k_DC_Tc-\frac{r_CC_T}{g_D}d-\frac{\alpha_{DH}r_CC_T}{\alpha_{DH}g_D}h}{k_DC_Tc}\right)-\frac{a_D}{r_C}dP \\[2ex]
+\frac{dh}{dt} &= \frac{r_H}{r_C}h \left( \frac{k_HC_Tc-\frac{r_CC_T}{\alpha_{DH}g_D}h-\frac{\alpha_{HD}r_CC_T}{g_D}d}{k_HC_Tc}\right)-\frac{a_H}{r_C}hP \\[2ex]
+\end{align}
+$$
+
+We can perform some simplifications (especially, cancelling $C_T$ and dividing both numerator and denominator by $r_C/g_D$ in the logistic terms for damselfish and hawkfish) to clean up these equations:
+
+$$
+\begin{align}
+\frac{dc}{dt} &= \left(c+d+\frac{g_H}{\alpha_{DH}g_D}h\right)\left(1-c\right)-\frac{m}{r_C}c \\[2ex]
+\frac{dd}{dt} &= \frac{r_D}{r_C}d \left( \frac{\frac{k_Dg_D}{r_C}c-d-h}{\frac{k_Dg_D}{r_C}c}\right)-\frac{a_D}{r_C}dP \\[2ex]
+\frac{dh}{dt} &= \frac{r_H}{r_C}h \left( \frac{\frac{k_H \alpha_{DH} g_D}{r_C}c-h-\alpha_{HD}\alpha_{DH}d}{\frac{k_H \alpha_{DH} g_D}{r_C}c}\right)-\frac{a_H}{r_C}hP \\[2ex]
+\end{align}
+$$
+
+Finally, we'll rescale our last dimensional variable, $P$, by substituting $P = r_C/a_Dp$:
+
+$$
+\begin{align}
+\frac{dc}{dt} &= \left(c+d+\frac{g_H}{\alpha_{DH}g_D}h\right)\left(1-c\right)-\frac{m}{r_C}c \\[2ex]
+\frac{dd}{dt} &= \frac{r_D}{r_C}d \left( \frac{\frac{k_Dg_D}{r_C}c-d-h}{\frac{k_Dg_D}{r_C}c}\right)-dp \\[2ex]
+\frac{dh}{dt} &= \frac{r_H}{r_C}h \left( \frac{\frac{k_H \alpha_{DH} g_D}{r_C}c-h-\alpha_{HD}\alpha_{DH}d}{\frac{k_H \alpha_{DH} g_D}{r_C}c}\right)-\frac{a_H}{a_D}hp \\[2ex]
+\end{align}
+$$
+
+We now have eight dimensionless clusters of parameters. Let's replace them with new symbols representing these composites, where $\epsilon = g_H/(\alpha_{DH}g_D)$, $\mu = m/r_C$, $\rho_D=r_D/r_C$, $\rho_H = r_H/r_C$, $\kappa_D = (k_Dg_D)/r_C$, $\kappa_H=(k_H\alpha_{DH}g_D)/r_C$, $\phi = a_H/a_D$, and $\alpha = \alpha_{DH}\alpha_{HD}$.
+
+And, our dimensionless model is:
+
+$$
+\begin{align}
+\dot{c} &= \left(c+d+\epsilon h\right)\left(1-c\right)-\mu c \\[2ex]
+\dot{d} &= \rho_Dd \left( \frac{\kappa_Dc-d-h}{\kappa_Dc}\right)-dp \\[2ex]
+\dot{h} &= \rho_Hh \left( \frac{\kappa_Hc-h-\alpha d}{\kappa_Hc}\right)-\phi hp \\[2ex]
+\end{align}
+$$
+
+
+####Competitive Outcomes in a Predator-Free System
+
+We can determine general relationships between these parameters that result in indirect benefits from predators by examining the effect of predators on the equilibrium abundance of hawkfish and damselfish. This is because the benefit (growth enhancement) to corals is a function of the weighted biomass of these fishes ($D + \epsilon H$).
+
+We begin by considering the case in which predators are absent from the system ($p = 0$). This reduces the system to a Lotka-Volterra-esque competition model, with the exception that the carrying capacities of hawkfish and damselfish are proportional to coral biomass:
+
+$$
+\begin{align}
+\dot{d} &= \rho_D d \left(\frac{\kappa_Dc-d-h}{\kappa_Dc}\right) \\[1ex]
+\dot{h} &= \rho_Hh\left(\frac{\kappa_Hc-h-\alpha d}{\kappa_Hc}\right)  \\[1ex]
+\end{align}
+$$
+We compute the four zero net growth isoclines (ZNGIs) of the system by setting each ordinary differential equation equal to zero. From this we obtain:
+
+$$ d = 0\ \ \mathrm{and} \ \ \kappa_Dc-d-h=0$$
+which satisfy $\dot{d}=0$, and:
+$$h = 0 \ \ \mathrm{and} \ \ \kappa_Hc-h-\alpha d = 0 $$
+which satisfy $\dot{h} = 0$.
+
+Assuming a non-zero coral biomass, we can express these equations in terms of fish biomass per unit of coral biomass (i.e., in terms of $d/c$ and $h/c$), and then plot all four ZNGIs in the $d/c$, $h/c$ phase plane. As in the traditional Lotka-Volterra competition model, there are four possible non-trivial outcomes, excluding the trivial outcome in which $\kappa_D = \kappa_H$ and $\alpha = 1$, and therefore the species are equivalent to one another and all coexistence equilibria are neutrally stable (Figure 4). If $\kappa_D \geq \kappa_H/\alpha$, the damselfish-only equilibrium is stable, and if $\kappa_H \geq \kappa_D$, the hawkfish-only equilibrium is stable. When both conditions are satisfied, the system exhibits bistability, and when neither condition is satisfied, the interior coexistence equilibrium is stable. 
+
+
+```{r LV.ZNGIs, echo=FALSE, fig.height = 5, fig.width=5}
+Dset <- seq(from = 0, to = k_D*2, length.out = 100)
+
+k_H2 <- k_H*1.1
+
+k_H_coex <- 0.8*k_H
+alpha_dam <- 1.5
+k_D_ass <- 1.2*k_H
+alpha_ass <- 1.5
+k_H_ass <- 1.1*k_H
+
+par(mar=c(4,4,1,1),mfrow=c(2,2))
+plot(Dset,k_D-Dset,lwd=2,col=dcol,type='l',xlab='',ylab='h/c', xlim=c(0,k_D*2),ylim=c(0,k_H2*1.1),las=1,main='Hawkfish-dominant'); abline(h=0,lwd=2,col=hcol); abline(v=0,lwd=2,col=dcol); lines(Dset,k_H2-alpha*Dset,lwd=2,col=hcol); points(0,k_H2,pch=21,bg='black',cex=1.5,lwd=2); points(0,0,pch=21,cex=1.5,lwd=2); points(k_D,0,pch=21,cex=1.5,lwd=2) 
+
+
+plot(Dset,k_D-Dset,lwd=2,col=dcol,type='l',xlab='',ylab='', xlim=c(0,k_D*2),ylim=c(0,k_H2*1.1),las=1,main='Damselfish-dominant'); abline(h=0,lwd=2,col=hcol); abline(v=0,lwd=2,col=dcol); lines(Dset,k_H*.9-alpha_dam*Dset,lwd=2,col=hcol); points(0,k_H*.9,pch=21,cex=1.5,lwd=2); points(0,0,pch=21,cex=1.5,lwd=2); points(k_D,0,pch=21,cex=1.5,lwd=2,bg='black') 
+
+
+plot(Dset,k_D-Dset,lwd=2,col=dcol,type='l',xlab='d/c',ylab='h/c', xlim=c(0,k_D*2),ylim=c(0,k_H2*1.1),las=1,main='Coexistence'); abline(h=0,lwd=2,col=hcol); abline(v=0,lwd=2,col=dcol); lines(Dset,k_H_coex-alpha*Dset,lwd=2,col=hcol); points(0,k_H_coex,pch=21,cex=1.5,lwd=2); points(0,0,pch=21,cex=1.5,lwd=2); points(k_D,0,pch=21,cex=1.5,lwd=2); points((k_H_coex-k_D)/(alpha-1), k_H_coex- alpha*(k_H_coex-k_D)/(alpha-1),lwd=2,cex=1.5,pch=21,bg='black') 
+
+
+plot(Dset,k_D-Dset,lwd=2,col=dcol,type='l',xlab='d/c',ylab='', xlim=c(0,k_D*2),ylim=c(0,k_H2*1.1),las=1,main='Alternate States'); abline(h=0,lwd=2,col=hcol); abline(v=0,lwd=2,col=dcol); lines(Dset,k_H_ass-alpha_ass*Dset,lwd=2,col=hcol); points(0,k_H_ass,pch=21,bg='black',cex=1.5,lwd=2); points(0,0,pch=21,cex=1.5,lwd=2); points(k_D,0,pch=21,cex=1.5,lwd=2,bg='black'); points((k_H_ass-k_D)/(alpha_ass-1), k_H_ass- alpha_ass*(k_H_ass-k_D)/(alpha_ass-1),lwd=2,cex=1.5,pch=21) 
+
+```
+
+**Figure S1:** Zero-net growth isoclines (ZNGIs) showing four possible outcomes of competition: (A) Dominance by competitor one (hawkfish), (B) Dominance by competitor two (damselfish), (C) coexistence, and (D) alternative states. Green lines show the zero net growth isoclines for damselfish (i.e., $dc/dt = 0$), and blue lines show the zero net growth isoclines for hawkfish (i.e., $dh/dt = 0$).
+
+
+In order to derive conditions for which predators may indirectly enhance mutualisms, we focus on the case shown in Figure S1A, in which the lower quality mutualist (hawkfish) is competitively dominant in the absence of predation. Using the mathematical relationship describing the effects of fish fertilization on coral growth, we can also plot a line in hawkfish-damselfish space showing the combinations of hawkfish and damselfish that provide nutrient supplementation equivalent to hawkfish alone.
+
+
+In this case, in the absence of predators, mutualist resource provision is done by only one mutualist. That is, in our system, coral growth enhancement occurs solely due to the nutrient excretion of hawkfish. The rescaled excretion rate of hawkfish is $\epsilon$, and the rescaled per-coral carrying capacity of hawkfish is $\kappa_H$. Thus, at equilibrium, the amount of hawkfish per coral biomass is $\kappa_H$, and the amount of excretion fertilization received per coral biomass is $\epsilon \kappa_H$. We can contrast this predator-free mutualism goods production rate with the rate produced by any combination of hawkfish and damselfish per unit of coral biomass, which is given by:
+$$ \frac{d}{c} + \epsilon \frac{h}{c}.$$
+Thus, there is a mutualism community equivalency line, given by 
+$$ \epsilon \kappa_H = \frac{d}{c}+ \epsilon \frac{h}{c}$$
+which describes the combination of damselfish and hawkfish that produce the same amount of mutualist goods as are found in the hawkfish-only, predator-free equilibrium. We superimpose this line (in orange) on the phase plane in Figure S2.
+
+```{r Hawkfishcase, echo=FALSE, fig.height = 5, fig.width=5}
+epsilon <- .5
+fertshade <- rgb(0,0,0,.1)
+Dset <- seq(from = 0, to = k_D*2, length.out = 100)
+
+k_H2 <- k_H*1.1
+
+k_H_coex <- 0.8*k_H
+alpha_dam <- 1.5
+k_D_ass <- 1.2*k_H
+alpha_ass <- 1.5
+k_H_ass <- 1.1*k_H
+
+par(mar=c(4,4,1,1))
+plot(Dset,k_D-Dset,lwd=2,col=dcol,type='n',xlab='Damselfish per coral, d/c',ylab='Hawkfish per coral, h/c', xlim=c(0,k_D*2),ylim=c(0,k_H2*1.1),las=1);
+polygon(x = c(0, epsilon*k_H2, 1.5*max(Dset), 1.5*max(Dset), 0), y = c(k_H2,0,0,1.5*k_H2,1.5*k_H2), col = fertshade); lines(Dset,k_H2-Dset/epsilon,lwd=2,col=ccol); 
+lines(Dset,k_D-Dset, lwd=2, col = dcol)
+abline(h=0,lwd=2,col=hcol); abline(v=0,lwd=2,col=dcol); lines(Dset,k_H2-alpha*Dset,lwd=2,col=hcol); points(0,k_H2,pch=21,bg='black',cex=1.5,lwd=2); points(0,0,pch=21,cex=1.5,lwd=2); points(k_D,0,pch=21,cex=1.5,lwd=2)
+
+```
+
+**Figure S2:** Phase plane for a hawkfish-dominated system. Green lines show the zero net growth isoclines for damselfish (i.e., $dc/dt = 0$), and blue lines show the zero net growth isoclines for hawkfish (i.e., $dh/dt = 0$). The orange line shows the mutualism-equivalency line: combinations of hawkfish and damselfish that produce the same level of goods (excrete the same amount of nitrogen) as hawkfish do at the predator-free equilibrium (filled black circle). When more damselfish and hawkfish exist per coral biomass than are given by the mutualism-equivalency line (gray shaded area), corals are expected to be larger than in the predator-free equilibrium because they are experiencing greater fish fertilization.
+
+
+
+
+#### Effects of predation on mutualist equilibrium
+
+When predators are present, they act to reduce the abundance of both mutualists. The extent of this reduction is shaped by $\phi$, the predator's preference for hawkfish (the dominant competitor). Assuming non-zero coral biomass and writing our equations in terms of $h/c$ and $d/c$, we obtain the four ZNGIs:
+$$
+\begin{align}
+d = 0 \ \ &\mathrm{and} \ \ \kappa_D-\frac{d}{c}-\frac{h}{c}-\frac{p\kappa_D}{\rho_D}=0 \\[1ex]
+h = 0 \ \ &\mathrm{and} \ \ \kappa_H-\frac{h}{c}-\alpha\frac{d}{c}-\frac{\phi p\kappa_H}{\rho_H}=0 \\[1ex]
+\end{align}
+$$
+From these equations and their effect on the system's equilibria, we can see that the overall effect of predators will be to reduce the abundances of both hawkfish and damselfish (Figure S3). The larger $\phi$, the greater the differential effect on hawkfish. In particular, the hawkfish-only equilibrium will be destabilized once $p$ has increased sufficiently to satisfy
+$$\kappa_D\left(1-\frac{p}{\rho_D}\right) > \kappa_H\left(1-\phi\frac{p}{\rho_H}\right)$$
+
+Because $\kappa_H \geq \kappa_D$ (such that the hawkfish are competitively dominant to the damselfish), such a relationship can only be satisfied if 
+$$1-\frac{p}{\rho_D} > 1-\phi\frac{p}{\rho_H}$$
+or, by rearrangement, $\phi > \rho_H / \rho_D$. In the scenario in which $\rho_H = \rho_D = \rho$, $\phi$ must be greater than $1$. In other words, absent biological differences in the species that affect growth rates, predators may only drive coexistence when the dominant competitor (hawkfish) are more sensitive to predation.
+
+```{r predeffects, echo=FALSE, fig.height=2, fig.width=10}
+phi <- 5
+Dset <- seq(from = 0, to = k_D*2, length.out = 100)
+
+par(mar=c(2,2,1,1),mfrow=c(1,5))
+pchoices = c(0,0.00333, 0.00666, 0.01,0.01333)
+
+for(i in 1:length(pchoices)){
+  # Make base plot with shaded region
+  plot(Dset,k_D-Dset,lwd=2,col=dcol,type='n',xlab='d/c',ylab='h/c', xlim=c(0,k_D*1.5),ylim=c(0,k_H2*1.1),las=1); polygon(x = c(0, epsilon*k_H2, 1.5*max(Dset), 1.5*max(Dset), 0), y = c(k_H2,0,0,1.5*k_H2,1.5*k_H2), col = fertshade); lines(Dset,k_H2-Dset/epsilon,lwd=2,col=ccol); abline(h= 0, lwd=2, col=hcol); abline(v = 0, lwd=2, col=dcol)
+  
+  # Plot ZNGIs with predators
+  p <- pchoices[i]
+  lines(Dset,k_D-Dset-p*k_D/rho_D,lwd=2,col=dcol) # Damselfish ZNGI
+  lines(Dset,k_H2-alpha*Dset-p*k_H2/rho_H*phi,lwd=2,col=hcol) # Hawkfish ZNGI 
+  points(0,0,pch=21,cex=2,lwd=2) # (0,0) equilibrium -- always unstable
+  points(0,k_H2-phi*p*k_H2/rho_H,pch=21,cex=2,lwd=2);  # hawkfish-only equilibrium
+  points(k_D-p*k_D/rho_D,0,pch=21,cex=2,lwd=2);   # damselfish-only equilibrium
+  dhat <- 1/(1-alpha)*(k_D*(1-p/rho_D)-k_H2*(1-p*phi/rho_H)); hhat <- k_D*(1-p/rho_D)-dhat; points(dhat,hhat,pch=21,cex=2,lwd=2) # coexistence equilibrium
+  
+  if(i == 1){ points(0,k_H2-phi*p*k_H2/rho_H,pch=21,cex=2,lwd=2,bg='black')   }
+  if(i%in%c(2,3,4)){ points(dhat,hhat,pch=21,cex=2,lwd=2,bg='black')   }
+  if(i == 5){ points(k_D-p*k_D/rho_D,0,pch=21,cex=2,lwd=2,bg='black')   }
+  
+}
+ #points(0,k_H,pch=21,bg='black',cex=1.5,lwd=2);  points(k_D,0,pch=21,cex=1.5,lwd=2)
+#dhat <- 1/(1-alpha)*(k_D*(1-p/rho_D)-k_H*(1-p*phi/rho_H))
+        #hhat <- k_D*(1-p/rho_D)-dhat
+        #points(dhat,hhat,pch=21,cex=1.5,lwd=2,bg='black')
+
+```
+**Figure S3:** The presence of the predator alters equilibrium outcomes. Green lines show the zero net growth isoclines for damselfish (i.e., $dc/dt = 0$), and blue lines show the zero net growth isoclines for hawkfish (i.e., $dh/dt = 0$). The orange line shows the mutualism-equivalency line. When hawkfish are more sensitive to predation than dameselfish ($\phi = 5$), increasing predator abundance (from left to right) qualitatively shifts the system's dynamics from hawkfish to damselfish dominated. Once predators are sufficiently abundant (panel C), they cause indirect benefits to the coral (note shift in stable equilibria, marked by filled black circles, from white to gray shaded region). Parameters are...
+
+
+When the two diagonal ZNGIs intersect in the positive phase plane, coexistence is stable. The equilibrium abundance of hawkfish and damselfish can be computed by equating these ZNGIs. This internal equilibrium, which we designate $(\hat{d},\hat{h})$, is given by:
+$$
+\begin{align}
+\hat{d} &= c(1-\alpha)^{-1}\left[\kappa_D\left(1-\frac{p}{\rho_D} \right) - \kappa_H\left(1-\frac{\phi p}{\rho_H} \right) \right] \\
+\hat{h} &= c\kappa_D\left(1-\frac{p}{\rho_D} \right) - \hat{d}
+\end{align}
+$$
+
+We can plot this equilibrium in $d/c,h/c$ space, as well (Figure S4).
+
+```{r ZNGIs.plus.p, echo=FALSE, fig.height = 5, fig.width=5}
+
+rho_D <- rho
+rho_H <- rho
+
+epsilon <- .5
+phi <- 5
+fertshade <- rgb(0,0,0,.1)
+Dset <- seq(from = 0, to = k_D*2, length.out = 100)
+
+k_H2 <- k_H*1.1
+
+pset <- seq(from = 0, to = 0.1, length.out=1000)
+dhat <- NaN*pset
+hhat <- dhat
+for(i in 1:length(pset)){
+  dhat[i] <- 1/(1-alpha)*(k_D*(1-pset[i]/rho_D)-k_H2*(1-pset[i]*phi/rho_H))
+  hhat[i] <- k_D*(1-pset[i]/rho_D)-dhat[i]
+  if(dhat[i] < 0){
+    dhat[i] <- 0
+    hhat[i] <- k_H2 - pset[i]*phi*k_H2/rho_H
+  }
+  if(hhat[i] < 0){
+    hhat[i] <- 0
+    dhat[i] <- k_D-pset[i]*k_D/rho_D
+  }
+}
+
+pset2 <- seq(from = 0, to = 0.1, by = 0.002)
+dhat2 <- NaN*pset2
+hhat2 <- dhat2
+for(i in 1:length(pset2)){
+  dhat2[i] <- 1/(1-alpha)*(k_D*(1-pset2[i]/rho_D)-k_H2*(1-pset2[i]*phi/rho_H))
+  hhat2[i] <- k_D*(1-pset2[i]/rho_D)-dhat2[i]
+  if(dhat2[i] < 0){
+    dhat2[i] <- 0
+    hhat2[i] <- k_H2 - pset2[i]*phi*k_H2/rho_H
+  }
+  if(hhat2[i] < 0){
+    hhat2[i] <- 0
+    dhat2[i] <- k_D-pset2[i]*k_D/rho_D
+  }
+}
+
+#dhat <- 1/(1-alpha)*(k_D*(1-p/rho_D)-k_H2*(1-pset*phi/rho_H)); hhat <- k_D*(1-pset/rho_D)-dhat
+
+
+par(mar=c(4,4,1,1))
+plot(Dset,k_D-Dset,lwd=2,col=dcol,type='n',xlab='Damselfish per coral, d/c',ylab='Hawkfish per coral, h/c', xlim=c(0,k_D*1.5),ylim=c(0,k_H2*1.1),las=1);
+polygon(x = c(0, epsilon*k_H2, 1.5*max(Dset), 1.5*max(Dset), 0), y = c(k_H2,0,0,1.5*k_H2,1.5*k_H2), col = fertshade); lines(Dset,k_H2-Dset/epsilon,lwd=2,col=ccol); 
+lines(Dset,k_D-Dset, lwd=2, col = dcol)
+abline(h=0,lwd=2,col=hcol); abline(v=0,lwd=2,col=dcol); lines(Dset,k_H2-alpha*Dset,lwd=2,col=hcol);
+lines(dhat,hhat,lwd=4,col=pcol)
+points(dhat2,hhat2,pch=21,lwd=2,cex=1.5)
+#points(0,k_H2,pch=21,bg='black',cex=1.5,lwd=2); points(0,0,pch=21,cex=1.5,lwd=2); points(k_D,0,pch=21,cex=1.5,lwd=2)
+
+text(x = c(0.07, 0.07, 0.08,0.87,0.55,0.03), y = c(1.1,.99,.82,0.06,0.06,0.06), c('A','B','C','D','E','F'),cex=1)
+
+#pmin <- (k_H2-k_D)*(1-alpha*epsilon)/(k_H2*phi/rho_H*(1-epsilon)-k_D/rho_D*(1-epsilon*alpha)); abline(v = 1/(1-alpha)*(k_D*(1-pmin/rho_D)-k_H2*(1-pmin*phi/rho_H))) # checking the lower bound of predator benefits
+
+#pmax <- rho_D/k_D*(k_D-epsilon*k_H2); abline(v = k_D*(1-pmax/rho_D)) # checking the upper bound of predator benefits
+
+
+```
+**Figure S4:** Phase plane for a hawkfish-dominated system. Green lines show the zero net growth isoclines for damselfish (i.e., $dc/dt = 0$), and blue lines show the zero net growth isoclines for hawkfish (i.e., $dh/dt = 0$) in a predator-free system. The orange line shows the mutualism-equivalency line, and the gray shaded area shows combinations of hawkfish and damselfish that produce coral growth enhancement relative to the predator-free equilibrium. The dark gray line shows the system's trajectory as predator abundance increases; black circles mark increases in predator abundance in increments of 0.002 from $p = 0$ to $p = 0.1$. A: At first, increases in predator abundance decrease the hawkfish population. B: When $p > 0.002$, the hawkfish population has been diminished so much that damselfish can begin to persist in the system. C: When $p > 0.00375$, predators have shifted the system towards damselfish so much that the coral receives indirect benefits (the system enters the shaded area of state space). D: Eventually, when $p > 0.012$, hawkfish have been extirpated; as the predator abundance increases, the damselfish population declines. E: Because $phi = 5$, the damselfish are much less sensitive to predation than hawkfish, and so larger increases in predator abundance are needed to shift the system past the point at which predators no longer benefit corals. F: Ultimately, predators are so abundant that damselfish are extirpated as well. 
+
+
+#### Conditions on predator-mediated mutualism enhancement
+From Figure S4, we can see that whether predators can indirectly benefit mutualist hosts depends upon whether the system's trajectory as predator abundance increases (gray line) intersects with the mutualism-equivalency (orange) line. This intersection will always occur if, at the predator abundance when hawkfish are extirpated (Figure S4, point D), damselfish are more abundant than their hawkfish-equivalent (Figure S4, point E). Mathematically, this means that when $\hat{h} = 0$, $\hat{d}$ must be greater than $\epsilon \kappa_H$.
+
+We first compute the critical predator abundance, $p_{crit}$, at which hawkfish have just been completely extirpated, and only damselfish are present in the system. We can find $p_{crit}$ by equating the x-intercepts of the diagonal ZNGIs:
+$$ \kappa_D -\frac{p\kappa_D}{\rho_D} = \frac{1}{\alpha}\left[\kappa_H - \frac{\phi \kappa_Hp}{\rho_H} \right]. $$
+By solving for $p$ we obtain
+$$ p_{crit} = \frac{\rho_H\rho_D\left(\kappa_H-\alpha\kappa_D\right)}{\rho_D\phi\kappa_H-\rho_H\alpha\kappa_D}. $$
+We can substitute this value of $p$ into either of the x-intercept expressions to determine the corresponding damselfish density ($d_{crit}/c$):
+$$ \frac{d_{crit}}{c} = \kappa_H\kappa_D \left[\frac{\phi\rho_D - \rho_H}{\rho_D\phi\kappa_H-\rho_H\alpha\kappa_D} \right].$$
+Because $d_{crit}/c$ must be greater than $\epsilon\kappa_H$ in order for predators to confer indirect benefits, we have:
+$$ \epsilon < \kappa_D \left[\frac{\phi\rho_D - \rho_H}{\rho_D\phi\kappa_H-\rho_H\alpha\kappa_D} \right].$$
+Note that in the case $\rho_D = \rho_H$ and $\kappa_D = \kappa_H$ (as in the main text), this inequality simplifies to:
+$$ \epsilon < \frac{\phi - 1}{\phi-\alpha}.$$
+
+
+#### Bounds on predator-mediated mutualism enhancement
+We can also compute the threshold predator abundances at which the predators begin to produce benefits ($p_\min$, i.e., the predator abundance at which the damselfish-hawkfish coexistence equilibrium produces more benefits than the hawkfish-only predator-free equilibrium, point C on Figure S4) and at which predators are so abundant that the mutualism's function is lowered ($p_\max$, i.e., the predator abundance at which the hawkfish have been extirpated, and the damselfish population has fallen so low that it produces fewer benefits than the hawkfish-only predator-free equilibrium, point E on Figure S4).
+
+We can find $p_\min$ by computing the intersection between the mutualist-equivalency line (Figure S4, orange line) and the predator-mediated coexistence line (Figure S4, gray line):
+$$ \epsilon \kappa_H = \frac{\hat{d}}{c} + \epsilon\frac{\hat{h}}{c}.$$
+By substitution, we obtain:
+$$p_\min = \frac{(\kappa_H-\kappa_D)(1-\alpha\epsilon)}{\frac{\kappa_H\phi}{\rho_H}(1-\epsilon)-\frac{\kappa_D}{\rho_D}(1-\epsilon\alpha)}.$$
+Note that in the case $\rho_D = \rho_H$ and $\kappa_D = \kappa_H$ (as in the main text), $p_\min$ simplifies to $p_\min=0$. In other words, when hawkfish and damselfish share the same per-coral carrying capacity, an introduction of even a very small amount of predators will produce benefits for the coral.
+
+We can find $p_\max$ by studying the behavior of the $dc/dt$ diagonal ZNGI in the absence of hawkfish (i.e., $h=0$):
+$$\kappa_D-\frac{d}{c}-\frac{p\kappa_D}{\rho_D}=0$$
+$p_\max$ is the predator abundance at which this ZNGI intersects the mutualist-equivalency line on the x-axis (Figure S4, point E). Mathematically, this means
+$$\frac{d}{c} = \kappa_D - \frac{p\kappa_D}{\rho_D} = \epsilon\kappa_H.$$
+Solving for $p$, we obtain:
+$$p_\max = \rho_D\left(1-\frac{\epsilon\kappa_H}{\kappa_D}\right).$$
+
+We can visualize these relationships on a ``quad diagram'':
+
+```{r, fig.width=8,fig.height=3}
+par(mar=c(4,4,1,1))
+layout(matrix(c(1,1,1,1,1,1,1,1,1,2,3,4,2,3,4,5,6,7,5,6,7),nrow=3,ncol=7,byrow=FALSE))
+
+epsset <- seq(from = 0.1, to = 1, length.out=10000)
+phiset <- c(1.1,1.2,1.4,1.8,3.6)
+phi <-1.3
+alphaset <- (1-phi*(1-epsset))/(epsset)
+plot(epsset,alphaset,log='xy',las=1,ylab='Alpha',xlab='Epsilon',type='l',ylim=c(0.1,10),xlim=c(0.1,10),col='dodgerblue')
+
+for(i in 1:length(phiset)){
+  phi <- phiset[i]
+  
+alphaset <- (1-phi*(1-epsset))/(epsset)
+  lines(epsset,alphaset,lwd=2,col=rgb(0,0,0,1-1/phiset[i]))
+}
+
+abline(h=1,lwd=2); abline(v=1, lwd=2)
+
+
+alphaset <- c(3,.5,.2,3,.3)
+epsilonset <- c(.3,.2,.5,2,2)
+
+text(x=epsilonset,y=alphaset,c('B','C','D','E','F'))
+
+phi <- 1.3
+
+# PARAMETERS
+k <- 1;				# scaling of fish carrying capacity with coral biomass
+k_D <- k;
+k_H <- k;
+
+rho <- 0.1;			# fish growth rates
+rho_D <- rho;
+rho_H <- rho;
+
+mu <- .9;			# coral intrinsic mortality rate
+
+epsilon <- 0.5;		# effect of hawkfish (pee) relative to damselfish
+
+# COLOURS
+dcol <- 'royalblue2'; hcol <- 'orange2'; ccol <- 'seagreen'; pcol <- 'gray50'
+
+# SIMULATION
+pset <- seq(from = 0, to = 0.2, length.out = 30)
+dstar <- matrix(rep(NaN,length(pset)*length(alphaset)),nrow=length(alphaset),ncol=length(pset))
+hstar <- dstar; cstar <- dstar;
+
+t_end <- 365*10;
+tset <- seq(from=0, to = t_end, length.out = 10*t_end)
+
+for(k in 1:length(alphaset)){
+  alpha <- alphaset[k]
+  epsilon <- epsilonset[k]
+for(j in 1:length(pset)){
+  p <- pset[j]
+d.simu1 <- NaN*tset; d.simu1[1] <- 0.5;
+h.simu1 <- d.simu1;
+c.simu1 <- d.simu1;
+for(i in 2:length(tset)){
+	dt <- tset[i]-tset[i-1]
+	d <- d.simu1[i-1]
+	h <- h.simu1[i-1]
+	c <- c.simu1[i-1]
+	dc <- ((c+d+epsilon*h)*(1-c)-mu*c)*dt  
+	dd <- (rho_D*d*(k_D*c-d-h)/(k_D*c)-d*p)*dt
+	dh <- (rho_H*h*(k_H*c-h-alpha*d)/(k_H*c)-phi*h*p)*dt
+	c.simu1[i] <- c+dc
+	d.simu1[i] <- d+dd
+	h.simu1[i] <- h+dh
+}
+	dstar[k,j] <- d.simu1[length(tset)];
+  hstar[k,j] <- h.simu1[length(tset)];
+  cstar[k,j] <- c.simu1[length(tset)];
+}  }
+
+par(mar=c(2,2,1,1))
+textlab <- c('B','C','D','E','F')
+for(i in 1:length(alphaset)){
+  plot(pset,cstar[i,1:length(pset)],col=ccol,lwd=2,las=1,xlab='Predators',ylab='Biomass', type='l',main=paste('alpha = ', alphaset[i],'; epsilon = ',epsilonset[i],sep=''), ylim=c(0,max(cstar[i,]))); 
+  lines(pset,dstar[i,1:length(pset)],col=dcol,lwd=2); lines(pset,hstar[i,1:length(pset)],col=hcol,lwd=2); text(x=max(pset)*0.95,y=.9*max(cstar[i,]),textlab[i])
+  #if(i == 1) {legend(x = 0,y=0.4*max(max(dstar[i,1:length(pset)],hstar[i,1:length(pset)],cstar[i,1:length(pset)])),legend=c('C*','D*','H*'),lwd=2,col=c(ccol,dcol,hcol),horiz=TRUE) }
+
+}
+
+i <- 1
+plot(pset,cstar[i,1:length(pset)],col=ccol,lwd=2,las=1,xlab='Predators',ylab='Biomass', ylim=c(0,2),type='n',xaxt='n',yaxt='n');legend(x = 0,y=2*1*max(max(dstar[i,1:length(pset)],hstar[i,1:length(pset)],cstar[i,1:length(pset)])),legend=c('C*','D*','H*'),lwd=2,col=c(ccol,dcol,hcol),horiz=TRUE) 
+
+```
+
